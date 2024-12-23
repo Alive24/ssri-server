@@ -2,3 +2,5 @@
 .vscode
 .aider*
 .env
+dist
+node_modules
