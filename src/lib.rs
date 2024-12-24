@@ -1,7 +1,3 @@
-#[cfg(target_arch = "wasm32")]
-use wasm_bindgen::prelude::*;
-#[cfg(target_arch = "wasm32")]
-use tokio_with_wasm::alias as tokio;
 use ckb_jsonrpc_types::{OutPoint, Script, TransactionView};
 use ckb_types::H256;
 use jsonrpsee::core::async_trait;
@@ -9,6 +5,8 @@ use jsonrpsee::proc_macros::rpc;
 use jsonrpsee::server::Server;
 use jsonrpsee::tracing;
 use jsonrpsee::types::ErrorObjectOwned;
+#[cfg(target_arch = "wasm32")]
+use wasm_bindgen::prelude::*;
 
 mod error;
 mod rpc_client;
@@ -22,7 +20,6 @@ use tower_http::cors::{Any, CorsLayer};
 use types::{CellOutputWithData, Hex};
 
 use ssri_vm::execute_riscv_binary;
-
 
 #[rpc(server)]
 pub trait Rpc {
@@ -163,7 +160,7 @@ impl RpcServer for RpcServerImpl {
 }
 
 // use this only for wasm
-#[cfg_attr(target_arch = "wasm32", wasm_bindgen, tokio::main(flavor = "current_thread"))]
+#[cfg_attr(target_arch = "wasm32", wasm_bindgen)]
 pub async fn run_server_main() -> anyhow::Result<()> {
     tracing_subscriber::FmtSubscriber::builder()
         .with_env_filter(tracing_subscriber::EnvFilter::from_default_env())
@@ -196,8 +193,12 @@ async fn run_server(ckb_rpc: &str, server_addr: &str) -> anyhow::Result<()> {
 
     let handle = server.start(RpcServerImpl::new(ckb_rpc).into_rpc());
 
-    tokio::signal::ctrl_c().await.unwrap();
-    handle.stop().unwrap();
+    #[cfg(not(target_arch = "wasm32"))]
+    {
+        // Native-specific waiting mechanism
+        std::thread::park(); // Simple blocking
+        handle.stop().unwrap();
+    }
 
     Ok(())
 }
