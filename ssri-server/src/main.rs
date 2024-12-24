@@ -5,8 +5,6 @@ use jsonrpsee::proc_macros::rpc;
 use jsonrpsee::server::Server;
 use jsonrpsee::tracing;
 use jsonrpsee::types::ErrorObjectOwned;
-#[cfg(target_arch = "wasm32")]
-use wasm_bindgen::prelude::*;
 
 mod error;
 mod rpc_client;
@@ -159,9 +157,8 @@ impl RpcServer for RpcServerImpl {
     }
 }
 
-// use this only for wasm
-#[cfg_attr(target_arch = "wasm32", wasm_bindgen)]
-pub async fn run_server_main() -> anyhow::Result<()> {
+#[tokio::main]
+async fn main() -> anyhow::Result<()> {
     tracing_subscriber::FmtSubscriber::builder()
         .with_env_filter(tracing_subscriber::EnvFilter::from_default_env())
         .try_init()
@@ -193,12 +190,8 @@ async fn run_server(ckb_rpc: &str, server_addr: &str) -> anyhow::Result<()> {
 
     let handle = server.start(RpcServerImpl::new(ckb_rpc).into_rpc());
 
-    #[cfg(not(target_arch = "wasm32"))]
-    {
-        // Native-specific waiting mechanism
-        std::thread::park(); // Simple blocking
-        handle.stop().unwrap();
-    }
+    tokio::signal::ctrl_c().await.unwrap();
+    handle.stop().unwrap();
 
     Ok(())
 }

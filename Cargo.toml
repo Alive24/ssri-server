@@ -1,31 +1,12 @@
-[package]
-name = "ssri-server"
-version = "0.1.0"
-edition = "2021"
+[workspace]
+members = [
+    "ssri-server-wasm",
+    "ssri-server"
+]
 
-[lib]
-crate-type = ["cdylib", "rlib"]
+resolver = "2"
 
-[dependencies]
-anyhow = "1.0.86"
-ckb-jsonrpc-types = "0.119.0"
-ckb-sdk = { git = "https://github.com/Alive24/ckb-sdk-rust", rev = "440bfda" }
-ckb-types = "0.119.0"
-ckb-hash = { version = "0.119.0", features = ["blake2b-ref"] }
-ckb-vm = "0.24.9"
-hex = { version = "0.4.3", features = ["serde"] }
-jsonrpc-core = "18.0.0"
-jsonrpsee = { version = "0.24.7", features = ["server", "macros"] }
-reqwest = { version = "0.12.5", features = ["json"] }
-serde = "1.0.204"
-tracing-subscriber = { version = "0.3.18", features = ["env-filter"] }
-tower-http = { version = "0.6.2", features = ['full'] }
-hyper = { version = "1.5.2", default-features = false }
-tower = { version = "0.4.13", default-features = false }
-wasm-bindgen = "0.2.99"
-wasm-bindgen-futures = "0.4"
-log = "0.4"
-wasm-logger = "0.2"
-getrandom = { version = "0.2", features = ["js"] }
-console_error_panic_hook = { version = "0.1.6", optional = true }
-tokio = { version = "1.42.0", features = ["rt"] }
+
+[profile.release]
+overflow-checks = true
+

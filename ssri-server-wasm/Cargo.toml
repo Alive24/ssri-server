@@ -1,0 +1,34 @@
+[package]
+name = "ssri-server-wasm"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+anyhow = "1.0.86"
+ckb-jsonrpc-types = "0.120.0"
+ckb-types = "0.120.0"
+ckb-hash = { version = "0.120.0", features = ["blake2b-ref"] }
+ckb-vm = "0.24.12"
+hex = { version = "0.4.3", features = ["serde"] }
+serde = "1.0.204"
+serde_json = { version = "1" }
+tracing-subscriber = { version = "0.3.18", features = ["env-filter"] }
+wasm-bindgen = "0.2.99"
+wasm-bindgen-futures = "0.4"
+log = "0.4"
+wasm-logger = "0.2"
+getrandom = { version = "0.2", features = ["js"] }
+console_error_panic_hook = { version = "0.1.6", optional = true }
+web-sys = { version = "0.3.76", features = [
+    "Window", 
+    "Request", 
+    "RequestInit", 
+    "RequestMode", 
+    "Response", 
+    "Headers",
+    "Url"
+]}
+serde-wasm-bindgen = "0.6"
